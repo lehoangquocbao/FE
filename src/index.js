@@ -1,31 +1,33 @@
-import axios from 'axios';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import App from './App'; // Component chính của ứng dụng
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import ProtectedRoute from './components/ProtectedRoute'; // Component bảo vệ route
 
-const API_URL = 'http://localhost:5000/api';
+const root = ReactDOM.createRoot(document.getElementById('root'));
 
-const axiosInstance = axios.create({
-  baseURL: API_URL,
-  timeout: 5000,
-});
+root.render(
+  <React.StrictMode>
+    <Router>
+      <Routes>
+        {/* Route cho trang đăng nhập, không cần bảo vệ */}
+        <Route path="/login" element={<Login />} />
 
-export const loginUser = async (username, password) => {
-  try {
-    const response = await axiosInstance.post('/auth/login', { username, password });
-    return response.data;
-  } catch (error) {
-    throw error.response.data;
-  }
-};
-
-export const getDashboardSummary = async () => {
-  const token = localStorage.getItem('access_token');
-  try {
-    const response = await axiosInstance.get('/dashboard/summary', {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    return response.data;
-  } catch (error) {
-    throw error.response.data;
-  }
-};
+        {/* Route cho trang Dashboard, cần được bảo vệ */}
+        <Route 
+          path="/dashboard" 
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Định nghĩa các route khác ở đây */}
+        {/* ... */}
+      </Routes>
+    </Router>
+  </React.StrictMode>
+);
